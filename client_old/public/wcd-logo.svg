@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
+  <circle cx="48" cy="48" r="45" fill="#0A1A2F" stroke="#F5B700" stroke-width="3"/>
+  <circle cx="48" cy="48" r="38" fill="none" stroke="#E63E8C" stroke-width="1.5"/>
+  <path d="M48 66 C36 56 30 48 30 41 a9 9 0 0 1 18 -3 a9 9 0 0 1 18 3 c0 7 -6 15 -18 25 z" fill="#E63E8C"/>
+  <circle cx="48" cy="30" r="5" fill="#F5B700"/>
+  <text x="48" y="84" text-anchor="middle" font-family="Arial, sans-serif" font-size="11" font-weight="700" fill="#F5B700">WCD</text>
+</svg>

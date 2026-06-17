@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: theme('fontFamily.body');
+  color: #eaf1f8;
+  background-color: theme('colors.ink');
+  /* Stadium-night pitch: radial spotlights over a deep navy, plus faint field stripes */
+  background-image:
+    radial-gradient(1200px 600px at 50% -10%, rgba(245, 183, 0, 0.10), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(230, 62, 140, 0.10), transparent 55%),
+    radial-gradient(900px 500px at 0% 100%, rgba(18, 184, 134, 0.10), transparent 55%),
+    repeating-linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.015) 0px,
+      rgba(255, 255, 255, 0.015) 2px,
+      transparent 2px,
+      transparent 56px
+    );
+  background-attachment: fixed;
+}
+
+@layer components {
+  .eyebrow {
+    @apply font-head font-bold uppercase tracking-[0.22em] text-[11px] text-gold;
+  }
+  .panel {
+    @apply rounded-2xl border border-white/10 bg-ink-2/70 backdrop-blur shadow-card;
+  }
+  .field-input {
+    @apply w-full rounded-xl border border-white/10 bg-ink/60 px-4 py-3 text-[15px] text-white
+           placeholder:text-muted outline-none transition
+           focus:border-gold/70 focus:ring-2 focus:ring-gold/30;
+  }
+  .btn-gold {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gold px-5 py-3
+           font-head font-bold uppercase tracking-wide text-ink transition
+           hover:brightness-105 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-white/15
+           px-4 py-2.5 font-head font-semibold uppercase tracking-wide text-white/90
+           transition hover:bg-white/5 active:scale-[0.98];
+  }
+  .stat-num {
+    @apply font-display tabular-nums leading-none;
+  }
+}
+
+/* Honour reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* Custom scrollbar on the participant tables */
+.thin-scroll::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+.thin-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 8px;
+}
