@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { getTeams, getDashboard, register } from '../api';
 import CountdownTimer from '../components/CountdownTimer.jsx';
 import ImageHero from '../components/ImageHero.jsx';
+import TeamSelect from '../components/TeamSelect.jsx';
 
 const EMPTY = { full_name: '', designation: '', section: '', whatsapp: '', team: '' };
 
@@ -133,14 +134,14 @@ export default function Register() {
 
         <div className="space-y-4">
           <Field label="Full name" error={errors.full_name}>
-            <input className="field-input" value={form.full_name} onChange={set('full_name')} placeholder="e.g. Adarsh A" />
+            <input className="field-input" value={form.full_name} onChange={set('full_name')} placeholder="e.g. Anjali Menon" />
           </Field>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Designation" error={errors.designation}>
-              <input className="field-input" value={form.designation} onChange={set('designation')} placeholder="e.g. Clerk" />
+              <input className="field-input" value={form.designation} onChange={set('designation')} placeholder="e.g. Project Officer" />
             </Field>
             <Field label="Section" error={errors.section}>
-              <input className="field-input" value={form.section} onChange={set('section')} placeholder="e.g. Account Section" />
+              <input className="field-input" value={form.section} onChange={set('section')} placeholder="e.g. ICDS" />
             </Field>
           </div>
           <Field label="WhatsApp number" error={errors.whatsapp}>
@@ -154,14 +155,7 @@ export default function Register() {
             />
           </Field>
           <Field label="Predicted winning team" error={errors.team}>
-            <select className="field-input" value={form.team} onChange={set('team')}>
-              <option value="">Select a team…</option>
-              {activeTeams.map((t) => (
-                <option key={t.id} value={t.name}>
-                  {t.flag} {t.name}
-                </option>
-              ))}
-            </select>
+            <TeamSelect teams={teams} value={form.team} onChange={(name) => { setForm((f) => ({ ...f, team: name })); setErrors((er) => ({ ...er, team: undefined })); }} />
           </Field>
 
           <AnimatePresence>

@@ -1,4 +1,6 @@
 const PDFDocument = require('pdfkit');
+const fs = require('fs');
+const path = require('path');
 const db = require('../db');
 
 // Palette to match the app
@@ -8,6 +10,32 @@ const PINK = '#E63E8C';
 const GREEN = '#12B886';
 const MUTED = '#5B6B7B';
 const LINE = '#D8DEE6';
+
+// Look for a real logo dropped into server/assets (logo.png / .jpg / .jpeg).
+// PDFKit supports PNG and JPEG. SVG is not supported here.
+function findLogoFile() {
+  const dir = path.join(__dirname, '..', 'assets');
+  for (const name of ['logo.png', 'logo.jpg', 'logo.jpeg']) {
+    const p = path.join(dir, name);
+    if (fs.existsSync(p)) return p;
+  }
+  return null;
+}
+
+// Draws the logo into a box of side 2*r at (x,y): real image if present,
+// otherwise the placeholder mark.
+function placeLogo(doc, x, y, r) {
+  const file = findLogoFile();
+  if (file) {
+    try {
+      doc.image(file, x, y, { fit: [2 * r, 2 * r], align: 'center', valign: 'center' });
+      return;
+    } catch (e) {
+      // fall through to placeholder if the image can't be read
+    }
+  }
+  drawLogo(doc, x, y, r);
+}
 
 function drawLogo(doc, x, y, r) {
   // Simple WCD logo placeholder: a gold ring with a pink heart-in-shield mark.
@@ -76,7 +104,7 @@ async function dailyReport(req, res) {
 
     // ---- Header band ----
     doc.rect(0, 0, doc.page.width, 96).fill(INK);
-    drawLogo(doc, left, 22, 26);
+    placeLogo(doc, left, 22, 26);
     doc
       .fillColor(GOLD)
       .font('Helvetica-Bold')
@@ -144,7 +172,7 @@ async function dailyReport(req, res) {
         .font('Helvetica-Bold')
         .fontSize(12)
         .text(
-          `${t.flag ? t.flag + '  ' : ''}${t.name}${t.is_eliminated ? '  — ELIMINATED' : ''}`,
+          `${t.name}${t.is_eliminated ? '  — ELIMINATED' : ''}`,
           left + 10,
           barY + 7
         );

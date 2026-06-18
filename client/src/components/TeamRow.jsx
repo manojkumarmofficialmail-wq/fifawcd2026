@@ -1,11 +1,14 @@
 import { motion } from 'framer-motion';
+import Jersey from './Jersey.jsx';
+import Flag from './Flag.jsx';
+import { metaFor } from '../teamMeta.js';
 
-// One team in the live breakdown. Eliminated teams desaturate, dim,
-// and show a struck-through name. `max` scales the bar.
+// One team in the live breakdown: jersey + flag, progress bar, eliminated styling.
 export default function TeamRow({ team, max, rank }) {
   const pct = max > 0 ? Math.round((team.active_count / max) * 100) : 0;
   const out = team.is_eliminated;
   const isLeader = rank === 0 && !out && team.active_count > 0;
+  const meta = metaFor(team.name);
 
   return (
     <motion.div
@@ -17,20 +20,19 @@ export default function TeamRow({ team, max, rank }) {
         isLeader ? 'shadow-glow ring-1 ring-gold/40' : ''
       } ${out ? 'grayscale' : ''}`}
     >
-      <span className="w-6 text-center font-head text-xs text-muted">{rank + 1}</span>
-      <span className="text-2xl leading-none" aria-hidden>
-        {team.flag || '⚽'}
-      </span>
+      <span className="w-5 text-center font-head text-xs text-muted">{rank + 1}</span>
+      <Jersey colors={meta.colors} size={30} />
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">
           <p
-            className={`truncate font-head text-sm font-bold ${
-              out ? 'text-white/60 line-through' : 'text-white'
+            className={`flex min-w-0 items-center gap-2 font-head text-sm font-bold ${
+              out ? 'text-white/60' : 'text-white'
             }`}
           >
-            {team.name}
-            {isLeader && <span className="ml-2 align-middle text-[10px] text-gold">★ TOP</span>}
-            {out && <span className="ml-2 align-middle text-[10px] text-hot">OUT</span>}
+            <Flag code={meta.code} size="0.95rem" />
+            <span className={`truncate ${out ? 'line-through' : ''}`}>{team.name}</span>
+            {isLeader && <span className="shrink-0 text-[10px] text-gold">★ TOP</span>}
+            {out && <span className="shrink-0 text-[10px] text-hot">OUT</span>}
           </p>
           <p className="stat-num shrink-0 text-lg text-white">{team.active_count}</p>
         </div>

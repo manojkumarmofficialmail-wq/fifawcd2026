@@ -4,6 +4,8 @@ import { getDashboard, pdfUrl } from '../api';
 import StatTile from '../components/StatTile.jsx';
 import TeamRow from '../components/TeamRow.jsx';
 import ImageHero from '../components/ImageHero.jsx';
+import Flag from '../components/Flag.jsx';
+import { metaFor } from '../teamMeta.js';
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
@@ -66,8 +68,9 @@ export default function Dashboard() {
             <ImageHero src="/champion.jpg" overlay="center" className="min-h-[280px] ring-1 ring-gold/40">
               <div className="mx-auto text-center">
                 <p className="eyebrow">Champions decided</p>
-                <p className="hero-title mt-2 font-display text-5xl text-gold sm:text-6xl">
-                  {champion.flag} {champion.team}
+                <p className="hero-title mt-2 flex items-center justify-center gap-3 font-display text-5xl text-gold sm:text-6xl">
+                  <Flag code={metaFor(champion.team).code} size="2.4rem" />
+                  {champion.team}
                 </p>
                 <p className="hero-sub mt-3 text-white">
                   {champion.winners.length} winning predictor{champion.winners.length === 1 ? '' : 's'}
@@ -104,7 +107,7 @@ export default function Dashboard() {
                   key={t.name}
                   className="inline-flex items-center gap-1.5 rounded-full border border-hot/40 bg-hot/10 px-3 py-1 text-sm text-white"
                 >
-                  {t.flag} {t.name}
+                  <Flag code={metaFor(t.name).code} size="0.9rem" /> {t.name}
                 </span>
               ))}
             </div>
@@ -136,9 +139,10 @@ export default function Dashboard() {
             {teamsOut.map((t) => (
               <span
                 key={t.name}
-                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-white/60 line-through"
+                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-white/60"
               >
-                {t.flag} {t.name}
+                <Flag code={metaFor(t.name).code} size="0.9rem" className="opacity-70" />
+                <span className="line-through">{t.name}</span>
               </span>
             ))}
           </div>

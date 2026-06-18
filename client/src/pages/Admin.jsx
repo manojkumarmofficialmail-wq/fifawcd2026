@@ -9,6 +9,8 @@ import {
   getUsers,
 } from '../api';
 import ImageHero from '../components/ImageHero.jsx';
+import Flag from '../components/Flag.jsx';
+import { metaFor } from '../teamMeta.js';
 
 // ISO -> value for <input type="datetime-local"> in the browser's local zone
 function toLocalInput(iso) {
@@ -203,8 +205,9 @@ function AdminPanel({ onLogout }) {
                 key={t.id}
                 className="flex items-center justify-between rounded-lg bg-white/5 px-3 py-2"
               >
-                <span className={`text-sm ${t.is_eliminated ? 'text-white/50 line-through' : 'text-white'}`}>
-                  {t.flag} {t.name}
+                <span className={`flex items-center gap-2 text-sm ${t.is_eliminated ? 'text-white/50' : 'text-white'}`}>
+                  <Flag code={metaFor(t.name).code} size="0.9rem" />
+                  <span className={t.is_eliminated ? 'line-through' : ''}>{t.name}</span>
                 </span>
                 <span className="stat-num text-base text-gold">
                   {t.active_count}
@@ -237,7 +240,7 @@ function AdminPanel({ onLogout }) {
               }`}
             >
               <span className="flex items-center gap-2 text-sm">
-                <span>{t.flag || '⚽'}</span>
+                <Flag code={metaFor(t.name).code} size="0.9rem" />
                 <span className={t.is_eliminated ? 'text-white/50 line-through' : 'text-white'}>
                   {t.name}
                 </span>

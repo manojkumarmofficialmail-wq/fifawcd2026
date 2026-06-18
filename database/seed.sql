@@ -1,81 +1,75 @@
 -- ============================================================
 -- Seed data for the FIFA World Cup 2026 Prediction Contest App
--- Run AFTER schema.sql:  psql -U <user> -d <database> -f seed.sql
+-- Run AFTER schema.sql:  npm run init-db   (or psql -f seed.sql)
+--
+-- This is a FRESH-START seed: 48 teams, ZERO participants.
+-- (Sample participants are provided commented-out at the bottom if you
+--  want test data while trying things out.)
 -- ============================================================
 
 -- ------------------------------------------------------------
--- TEAMS  (hosts + a broad set of strong national sides)
+-- TEAMS — exactly 48 (hosts + a broad set of strong national sides)
 -- ------------------------------------------------------------
 INSERT INTO teams (name, flag) VALUES
-  ('Argentina',    '🇦🇷'),
-  ('Brazil',       '🇧🇷'),
-  ('France',       '🇫🇷'),
-  ('England',      '🏴󠁧󠁢󠁥󠁮󠁧󠁿'),
-  ('Spain',        '🇪🇸'),
-  ('Germany',      '🇩🇪'),
-  ('Portugal',     '🇵🇹'),
-  ('Netherlands',  '🇳🇱'),
-  ('Italy',        '🇮🇹'),
-  ('Belgium',      '🇧🇪'),
-  ('Croatia',      '🇭🇷'),
-  ('Uruguay',      '🇺🇾'),
-  ('USA',          '🇺🇸'),
-  ('Mexico',       '🇲🇽'),
-  ('Canada',       '🇨🇦'),
-  ('Japan',        '🇯🇵'),
-  ('South Korea',  '🇰🇷'),
-  ('Morocco',      '🇲🇦'),
-  ('Senegal',      '🇸🇳'),
-  ('Switzerland',  '🇨🇭'),
-  ('Denmark',      '🇩🇰'),
-  ('Colombia',     '🇨🇴')
-ON CONFLICT (name) DO NOTHING;
-
--- A wider pool so the 48-team dropdown feels complete
-INSERT INTO teams (name, flag) VALUES
-  ('Australia',    '🇦🇺'),
-  ('Poland',       '🇵🇱'),
-  ('Serbia',       '🇷🇸'),
-  ('Ecuador',      '🇪🇨'),
-  ('Ghana',        '🇬🇭'),
-  ('Nigeria',      '🇳🇬'),
-  ('Cameroon',     '🇨🇲'),
-  ('Tunisia',      '🇹🇳'),
-  ('Egypt',        '🇪🇬'),
-  ('Saudi Arabia', '🇸🇦'),
-  ('Iran',         '🇮🇷'),
-  ('Qatar',        '🇶🇦'),
-  ('Costa Rica',   '🇨🇷'),
-  ('Peru',         '🇵🇪'),
-  ('Chile',        '🇨🇱'),
-  ('Paraguay',     '🇵🇾'),
-  ('Sweden',       '🇸🇪'),
-  ('Norway',       '🇳🇴'),
-  ('Austria',      '🇦🇹'),
-  ('Wales',        '🏴󠁧󠁢󠁷󠁬󠁳󠁿'),
-  ('Scotland',     '🏴󠁧󠁢󠁳󠁣󠁴󠁿'),
-  ('Turkey',       '🇹🇷'),
-  ('Ukraine',      '🇺🇦'),
-  ('Greece',       '🇬🇷'),
-  ('Algeria',      '🇩🇿')
+  ('Argentina',    'AR'),
+  ('Brazil',       'BR'),
+  ('France',       'FR'),
+  ('England',      'ENG'),
+  ('Spain',        'ES'),
+  ('Germany',      'DE'),
+  ('Portugal',     'PT'),
+  ('Netherlands',  'NL'),
+  ('Italy',        'IT'),
+  ('Belgium',      'BE'),
+  ('Croatia',      'HR'),
+  ('Uruguay',      'UY'),
+  ('USA',          'US'),
+  ('Mexico',       'MX'),
+  ('Canada',       'CA'),
+  ('Japan',        'JP'),
+  ('South Korea',  'KR'),
+  ('Morocco',      'MA'),
+  ('Senegal',      'SN'),
+  ('Switzerland',  'CH'),
+  ('Denmark',      'DK'),
+  ('Colombia',     'CO'),
+  ('Australia',    'AU'),
+  ('Poland',       'PL'),
+  ('Serbia',       'RS'),
+  ('Ecuador',      'EC'),
+  ('Ghana',        'GH'),
+  ('Nigeria',      'NG'),
+  ('Cameroon',     'CM'),
+  ('Tunisia',      'TN'),
+  ('Egypt',        'EG'),
+  ('Saudi Arabia', 'SA'),
+  ('Iran',         'IR'),
+  ('Qatar',        'QA'),
+  ('Costa Rica',   'CR'),
+  ('Peru',         'PE'),
+  ('Chile',        'CL'),
+  ('Paraguay',     'PY'),
+  ('Sweden',       'SE'),
+  ('Norway',       'NO'),
+  ('Austria',      'AT'),
+  ('Wales',        'WAL'),
+  ('Scotland',     'SCO'),
+  ('Turkey',       'TR'),
+  ('Ukraine',      'UA'),
+  ('Greece',       'GR'),
+  ('Algeria',      'DZ'),
+  ('Ivory Coast',  'CI')
 ON CONFLICT (name) DO NOTHING;
 
 -- ------------------------------------------------------------
--- SAMPLE USERS
+-- OPTIONAL sample participants (for testing only).
+-- To load them, remove the /* and */ around this block, then re-run init-db.
 -- ------------------------------------------------------------
+/*
 INSERT INTO users (full_name, designation, section, whatsapp, team, status) VALUES
-  ('Anjali Menon',      'Child Development Officer', 'Field Operations', '9847012301', 'Argentina',   'active'),
-  ('Rahul Nair',        'Junior Superintendent',     'Administration',   '9847012302', 'Brazil',      'active'),
-  ('Fathima Beevi',     'Project Officer',           'ICDS',             '9847012303', 'France',      'active'),
-  ('Suresh Kumar',      'Clerk',                     'Accounts',         '9847012304', 'Argentina',   'active'),
-  ('Deepa Pillai',      'Supervisor',                'Anganwadi',        '9847012305', 'Spain',       'active'),
-  ('Vinod Raj',         'Data Entry Operator',       'IT Cell',          '9847012306', 'Brazil',      'active'),
-  ('Lakshmi Devi',      'Programme Assistant',       'Field Operations', '9847012307', 'England',     'active'),
-  ('Mohammed Ashraf',   'Section Officer',           'Establishment',    '9847012308', 'Portugal',    'active'),
-  ('Geetha Krishnan',   'Counsellor',                'Women Protection', '9847012309', 'Germany',     'active'),
-  ('Arun Prasad',       'Office Attendant',          'General',          '9847012310', 'Netherlands', 'active'),
-  ('Sneha Thomas',      'Project Coordinator',       'ICDS',             '9847012311', 'France',      'active'),
-  ('Biju Varghese',     'Accountant',                'Accounts',         '9847012312', 'Argentina',   'active'),
-  ('Reshma Banu',       'Supervisor',                'Anganwadi',        '9847012313', 'Brazil',      'active'),
-  ('Hari Govind',       'Junior Clerk',              'Administration',   '9847012314', 'Morocco',     'active'),
-  ('Priya Soman',       'Programme Officer',         'Field Operations', '9847012315', 'Japan',       'active');
+  ('Anjali Menon',    'Child Development Officer', 'Field Operations', '9847012301', 'Argentina', 'active'),
+  ('Rahul Nair',      'Junior Superintendent',     'Administration',   '9847012302', 'Brazil',    'active'),
+  ('Fathima Beevi',   'Project Officer',           'ICDS',             '9847012303', 'France',    'active'),
+  ('Suresh Kumar',    'Clerk',                     'Accounts',         '9847012304', 'Argentina', 'active'),
+  ('Deepa Pillai',    'Supervisor',                'Anganwadi',        '9847012305', 'Spain',     'active');
+*/
