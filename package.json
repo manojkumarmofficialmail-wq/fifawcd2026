@@ -1,0 +1,21 @@
+{
+  "name": "fifa-wc2026",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FIFA World Cup 2026 Prediction Contest - Women and Child Welfare Committee",
+  "main": "server/index.js",
+  "engines": {
+    "node": "22.x"
+  },
+  "scripts": {
+    "build": "npm --prefix client install --include=dev && npm --prefix client run build",
+    "start": "node server/index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "pdfkit": "^0.15.0",
+    "pg": "^8.12.0"
+  }
+}
