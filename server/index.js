@@ -31,19 +31,27 @@ app.use('/api/teams', require('./routes/teams'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/pdf', require('./routes/pdf'));
 
-// ---- Optionally serve the built React client ----
-if (String(process.env.SERVE_CLIENT).toLowerCase() === 'true') {
-  const clientDist = path.join(__dirname, '..', 'client', 'dist');
-  if (fs.existsSync(clientDist)) {
+// ---- Serve the built React client ----
+// Serve by default; only skip if SERVE_CLIENT is explicitly "false".
+// Try several locations so it works regardless of how the host lays out files.
+if (String(process.env.SERVE_CLIENT || 'true').trim().toLowerCase() !== 'false') {
+  const candidates = [
+    path.join(__dirname, '..', 'client', 'dist'),
+    path.join(__dirname, 'client', 'dist'),
+    path.join(process.cwd(), 'client', 'dist'),
+    path.join(process.cwd(), 'dist'),
+  ];
+  const clientDist = candidates.find((p) => fs.existsSync(path.join(p, 'index.html')));
+  if (clientDist) {
     app.use(express.static(clientDist));
-    // SPA fallback for client-side routing
+    // SPA fallback for client-side routing (everything except /api)
     app.get('*', (req, res, next) => {
       if (req.path.startsWith('/api')) return next();
       res.sendFile(path.join(clientDist, 'index.html'));
     });
     console.log('Serving React client from', clientDist);
   } else {
-    console.warn('SERVE_CLIENT=true but client/dist not found. Run the client build first.');
+    console.warn('Client build not found. Checked:', candidates.join(' | '));
   }
 }
 
