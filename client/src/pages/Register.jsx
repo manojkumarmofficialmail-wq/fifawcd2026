@@ -134,14 +134,14 @@ export default function Register() {
 
         <div className="space-y-4">
           <Field label="Full name" error={errors.full_name}>
-            <input className="field-input" value={form.full_name} onChange={set('full_name')} placeholder="e.g. Anjali Menon" />
+            <input className="field-input" value={form.full_name} onChange={set('full_name')} placeholder="e.g. Adarsh A" />
           </Field>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Designation" error={errors.designation}>
-              <input className="field-input" value={form.designation} onChange={set('designation')} placeholder="e.g. Project Officer" />
+              <input className="field-input" value={form.designation} onChange={set('designation')} placeholder="e.g. Senior Clerk" />
             </Field>
             <Field label="Section" error={errors.section}>
-              <input className="field-input" value={form.section} onChange={set('section')} placeholder="e.g. ICDS" />
+              <input className="field-input" value={form.section} onChange={set('section')} placeholder="e.g. Account Section" />
             </Field>
           </div>
           <Field label="WhatsApp number" error={errors.whatsapp}>

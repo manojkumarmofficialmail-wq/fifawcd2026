@@ -28,7 +28,7 @@ export default function App() {
         <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/85 to-ink/70" />
         <div className="relative mx-auto max-w-6xl px-4 py-10 text-center sm:px-6">
           <p className="font-head text-sm font-extrabold uppercase tracking-[0.2em] text-gold">
-            Women and Child Welfare Committee
+            WCD Welfare Committee
           </p>
           <p className="mt-1 text-xs text-white/70">
             Directorate of Women and Child Development Department
