@@ -9,6 +9,7 @@
   },
   "scripts": {
     "build": "npm --prefix client install --include=dev && npm --prefix client run build",
+    "postinstall": "npm run build",
     "start": "node server/index.js"
   },
   "dependencies": {
