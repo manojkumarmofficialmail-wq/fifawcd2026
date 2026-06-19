@@ -37,6 +37,20 @@ export default function Dashboard() {
     );
   }
 
+  if (data.visibility && data.visibility.show_live === false) {
+    return (
+      <ImageHero src="/hero-dashboard.jpg" overlay="center" eager className="mt-6 min-h-[320px]">
+        <div className="mx-auto text-center">
+          <p className="eyebrow text-gold">Coming soon</p>
+          <h2 className="hero-title mt-2 font-display text-4xl text-white sm:text-5xl">
+            The live tracker isn't public yet
+          </h2>
+          <p className="hero-sub mt-3 text-white/85">Please check back once the contest is underway.</p>
+        </div>
+      </ImageHero>
+    );
+  }
+
   const { stats, teamBreakdown, teamsOut, eliminatedToday, champion } = data;
   const maxActive = Math.max(1, ...teamBreakdown.map((t) => t.active_count));
 

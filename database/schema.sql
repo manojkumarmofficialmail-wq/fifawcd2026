@@ -44,13 +44,15 @@ CREATE INDEX idx_users_status ON users(status);
 -- ADMIN_SETTINGS (single row holding the prediction window)
 -- ------------------------------------------------------------
 CREATE TABLE admin_settings (
-    id          INTEGER PRIMARY KEY DEFAULT 1,
-    start_time  TIMESTAMPTZ,
-    end_time    TIMESTAMPTZ,
+    id            INTEGER PRIMARY KEY DEFAULT 1,
+    start_time    TIMESTAMPTZ,
+    end_time      TIMESTAMPTZ,
+    show_register BOOLEAN NOT NULL DEFAULT TRUE,
+    show_live     BOOLEAN NOT NULL DEFAULT TRUE,
     CONSTRAINT single_row CHECK (id = 1)
 );
 
--- Seed the single settings row (window is open from now for 14 days by default)
-INSERT INTO admin_settings (id, start_time, end_time)
-VALUES (1, NOW(), NOW() + INTERVAL '14 days')
+-- Seed the single settings row (window open from now for 14 days by default)
+INSERT INTO admin_settings (id, start_time, end_time, show_register, show_live)
+VALUES (1, NOW(), NOW() + INTERVAL '14 days', TRUE, TRUE)
 ON CONFLICT (id) DO NOTHING;

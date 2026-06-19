@@ -27,7 +27,7 @@ async function getDashboard(req, res) {
       db.query(
         `SELECT name, flag, is_eliminated, eliminated_at FROM teams ORDER BY name ASC`
       ),
-      db.query(`SELECT start_time, end_time FROM admin_settings WHERE id = 1`),
+      db.query(`SELECT start_time, end_time, show_register, show_live FROM admin_settings WHERE id = 1`),
       db.query(
         `SELECT name, flag, eliminated_at
          FROM teams
@@ -82,7 +82,14 @@ async function getDashboard(req, res) {
       teamsIn,
       teamsOut,
       eliminatedToday: todayOut.rows,
-      window: settings.rows[0] || { start_time: null, end_time: null },
+      window: {
+        start_time: (settings.rows[0] || {}).start_time || null,
+        end_time: (settings.rows[0] || {}).end_time || null,
+      },
+      visibility: {
+        show_register: (settings.rows[0] || {}).show_register !== false,
+        show_live: (settings.rows[0] || {}).show_live !== false,
+      },
       champion,
     });
   } catch (err) {

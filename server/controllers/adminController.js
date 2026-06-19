@@ -7,16 +7,41 @@ async function login(req, res) {
   res.json({ ok: true, message: 'Admin key accepted.' });
 }
 
-// GET /api/admin/settings  -> current prediction window
+// GET /api/admin/settings  -> current prediction window + visibility
 async function getSettings(req, res) {
   try {
     const r = await db.query(
-      'SELECT start_time, end_time FROM admin_settings WHERE id = 1'
+      'SELECT start_time, end_time, show_register, show_live FROM admin_settings WHERE id = 1'
     );
-    res.json({ window: r.rows[0] || { start_time: null, end_time: null } });
+    const s = r.rows[0] || {};
+    res.json({
+      window: { start_time: s.start_time || null, end_time: s.end_time || null },
+      visibility: {
+        show_register: s.show_register !== false,
+        show_live: s.show_live !== false,
+      },
+    });
   } catch (err) {
     console.error('getSettings error:', err.message);
     res.status(500).json({ error: 'Could not read settings.' });
+  }
+}
+
+// POST /api/admin/visibility   body: { show_register, show_live }
+async function setVisibility(req, res) {
+  try {
+    const { show_register, show_live } = req.body || {};
+    const r = await db.query(
+      `UPDATE admin_settings
+       SET show_register = $1, show_live = $2
+       WHERE id = 1
+       RETURNING show_register, show_live`,
+      [!!show_register, !!show_live]
+    );
+    res.json({ message: 'Page visibility updated.', visibility: r.rows[0] });
+  } catch (err) {
+    console.error('setVisibility error:', err.message);
+    res.status(500).json({ error: 'Could not update visibility.' });
   }
 }
 
@@ -148,4 +173,4 @@ async function listUsers(req, res) {
   }
 }
 
-module.exports = { login, getSettings, setTime, eliminateTeam, listUsers };
+module.exports = { login, getSettings, setTime, setVisibility, eliminateTeam, listUsers };

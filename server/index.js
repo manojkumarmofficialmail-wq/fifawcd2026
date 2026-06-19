@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
+const db = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -24,26 +25,21 @@ app.use(express.json());
 // ---- Health check ----
 app.get('/api/health', (req, res) => res.json({ ok: true, service: 'wc2026-api' }));
 
-// ---- Temporary diagnostic: where are the built client files? ----
-app.get('/api/debug', (req, res) => {
-  const cands = [
-    path.join(__dirname, '..', 'client', 'dist'),
-    path.join(__dirname, 'client', 'dist'),
-    path.join(__dirname, 'public'),
-    path.join(process.cwd(), 'client', 'dist'),
-    path.join(process.cwd(), 'dist'),
-    path.join(process.cwd(), 'public'),
-  ];
-  const candidates = cands.map((p) => ({ path: p, hasIndexHtml: fs.existsSync(path.join(p, 'index.html')) }));
-  const safeList = (p) => { try { return fs.readdirSync(p); } catch (e) { return 'NOT READABLE: ' + e.code; } };
-  res.json({
-    __dirname,
-    cwd: process.cwd(),
-    serveClient: process.env.SERVE_CLIENT || '(unset)',
-    candidates,
-    listing_cwd: safeList(process.cwd()),
-    listing_parentOfServer: safeList(path.join(__dirname, '..')),
-  });
+// ---- Public visibility + window (used by the header/nav and pages) ----
+app.get('/api/visibility', async (req, res) => {
+  try {
+    const r = await db.query(
+      'SELECT start_time, end_time, show_register, show_live FROM admin_settings WHERE id = 1'
+    );
+    const s = r.rows[0] || {};
+    res.json({
+      window: { start_time: s.start_time || null, end_time: s.end_time || null },
+      show_register: s.show_register !== false,
+      show_live: s.show_live !== false,
+    });
+  } catch (e) {
+    res.status(500).json({ error: 'Could not load visibility.' });
+  }
 });
 
 // ---- API routes ----

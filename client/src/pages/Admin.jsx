@@ -4,6 +4,7 @@ import {
   adminLogin,
   getSettings,
   setTime,
+  setVisibility,
   getTeams,
   eliminateTeam,
   getUsers,
@@ -73,6 +74,8 @@ export default function Admin() {
 function AdminPanel({ onLogout }) {
   const [win, setWin] = useState({ start: '', end: '' });
   const [winMsg, setWinMsg] = useState(null);
+  const [vis, setVis] = useState({ show_register: true, show_live: true });
+  const [visMsg, setVisMsg] = useState(null);
   const [teams, setTeams] = useState([]);
   const [actionMsg, setActionMsg] = useState(null);
 
@@ -86,6 +89,22 @@ function AdminPanel({ onLogout }) {
   async function loadSettings() {
     const d = await getSettings();
     setWin({ start: toLocalInput(d.window?.start_time), end: toLocalInput(d.window?.end_time) });
+    if (d.visibility) {
+      setVis({
+        show_register: d.visibility.show_register !== false,
+        show_live: d.visibility.show_live !== false,
+      });
+    }
+  }
+
+  async function saveVisibility() {
+    setVisMsg(null);
+    try {
+      await setVisibility(vis.show_register, vis.show_live);
+      setVisMsg({ type: 'ok', text: 'Page visibility updated.' });
+    } catch (e) {
+      setVisMsg({ type: 'error', text: e?.response?.data?.error || 'Could not update visibility.' });
+    }
   }
   async function loadTeams() {
     const d = await getTeams();
@@ -218,6 +237,45 @@ function AdminPanel({ onLogout }) {
           </div>
         </section>
       </div>
+
+      {/* E. Public page visibility */}
+      <section className="panel p-6">
+        <h2 className="font-head text-lg font-bold text-white">E · Public page visibility</h2>
+        <p className="mb-4 mt-1 text-sm text-muted">Choose which pages the public can see.</p>
+        <div className="space-y-3">
+          <label className="flex cursor-pointer items-center justify-between rounded-xl bg-white/5 px-4 py-3">
+            <span className="text-sm text-white">
+              Show <b>Registration</b> page to public
+            </span>
+            <input
+              type="checkbox"
+              className="h-5 w-5 accent-gold"
+              checked={vis.show_register}
+              onChange={(e) => setVis((v) => ({ ...v, show_register: e.target.checked }))}
+            />
+          </label>
+          <label className="flex cursor-pointer items-center justify-between rounded-xl bg-white/5 px-4 py-3">
+            <span className="text-sm text-white">
+              Show <b>Live tracker</b> page to public
+            </span>
+            <input
+              type="checkbox"
+              className="h-5 w-5 accent-gold"
+              checked={vis.show_live}
+              onChange={(e) => setVis((v) => ({ ...v, show_live: e.target.checked }))}
+            />
+          </label>
+        </div>
+        {visMsg && (
+          <p className={`mt-3 text-sm ${visMsg.type === 'error' ? 'text-hot' : 'text-grass'}`}>{visMsg.text}</p>
+        )}
+        <button className="btn-gold mt-4" onClick={saveVisibility}>
+          Save visibility
+        </button>
+        <p className="mt-3 text-xs text-muted">
+          Tip: the Registration page also hides automatically once the prediction window closes.
+        </p>
+      </section>
 
       {/* C. Match result / eliminations */}
       <section className="panel p-6">

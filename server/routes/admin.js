@@ -4,6 +4,7 @@ const {
   login,
   getSettings,
   setTime,
+  setVisibility,
   eliminateTeam,
   listUsers,
 } = require('../controllers/adminController');
@@ -14,6 +15,7 @@ router.use(requireAdmin);
 router.post('/login', login);
 router.get('/settings', getSettings);
 router.post('/set-time', setTime);
+router.post('/visibility', setVisibility);
 router.post('/eliminate-team', eliminateTeam);
 router.get('/users', listUsers);
 
