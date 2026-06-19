@@ -10,6 +10,7 @@
 DROP TABLE IF EXISTS users CASCADE;
 DROP TABLE IF EXISTS teams CASCADE;
 DROP TABLE IF EXISTS admin_settings CASCADE;
+DROP TABLE IF EXISTS employees CASCADE;
 
 -- ------------------------------------------------------------
 -- TEAMS
@@ -39,6 +40,17 @@ CREATE TABLE users (
 
 CREATE INDEX idx_users_team   ON users(team);
 CREATE INDEX idx_users_status ON users(status);
+
+-- ------------------------------------------------------------
+-- EMPLOYEES (staff allowlist — who is allowed to register)
+-- ------------------------------------------------------------
+CREATE TABLE employees (
+    id      SERIAL PRIMARY KEY,
+    name    VARCHAR(120) NOT NULL,
+    section VARCHAR(120) NOT NULL
+);
+CREATE INDEX idx_employees_section ON employees(section);
+CREATE UNIQUE INDEX idx_employees_unique ON employees (lower(name), lower(section));
 
 -- ------------------------------------------------------------
 -- ADMIN_SETTINGS (single row holding the prediction window)

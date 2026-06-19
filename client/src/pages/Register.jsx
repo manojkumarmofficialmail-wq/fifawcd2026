@@ -1,15 +1,18 @@
 import { useEffect, useMemo, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, Navigate } from 'react-router-dom';
-import { getTeams, getDashboard, register } from '../api';
+import { getTeams, getDashboard, getEmployees, register } from '../api';
 import CountdownTimer from '../components/CountdownTimer.jsx';
 import ImageHero from '../components/ImageHero.jsx';
 import TeamSelect from '../components/TeamSelect.jsx';
+import SearchSelect from '../components/SearchSelect.jsx';
 
 const EMPTY = { full_name: '', designation: '', section: '', whatsapp: '', team: '' };
 
 export default function Register() {
   const [teams, setTeams] = useState([]);
+  const [employees, setEmployees] = useState([]);
+  const [sections, setSections] = useState([]);
   const [win, setWin] = useState(null);
   const [visibility, setVisibility] = useState(null);
   const [loaded, setLoaded] = useState(false);
@@ -31,8 +34,11 @@ export default function Register() {
 
   useEffect(() => {
     getTeams().then((d) => setTeams(d.teams)).catch(() => {});
+    getEmployees()
+      .then((d) => { setEmployees(d.employees || []); setSections(d.sections || []); })
+      .catch(() => {});
     refresh();
-    const id = setInterval(refresh, 20000); // keep the window/timer in sync with admin
+    const id = setInterval(refresh, 20000);
     return () => clearInterval(id);
   }, [refresh]);
 
@@ -45,22 +51,28 @@ export default function Register() {
 
   const showRegister = visibility ? visibility.show_register : true;
   const showLive = visibility ? visibility.show_live : true;
-  // The Register page is available while the admin allows it AND it isn't closed.
   const registerAvailable = showRegister && !closed;
 
+  // Allowlist mode is on once an employee list has been uploaded.
+  const useAllowlist = employees.length > 0;
+  const namesForSection = useMemo(
+    () => employees.filter((e) => e.section === form.section).map((e) => e.name),
+    [employees, form.section]
+  );
   const activeTeams = useMemo(() => teams.filter((t) => !t.is_eliminated), [teams]);
 
-  const set = (k) => (e) => {
-    setForm((f) => ({ ...f, [k]: e.target.value }));
+  const setField = (k, v) => {
+    setForm((f) => ({ ...f, [k]: v }));
     setErrors((er) => ({ ...er, [k]: undefined }));
     setServerMsg(null);
   };
+  const onText = (k) => (e) => setField(k, e.target.value);
 
   function validate() {
     const er = {};
-    if (!form.full_name.trim()) er.full_name = 'Enter your full name.';
+    if (!form.section.trim()) er.section = 'Select your section.';
+    if (!form.full_name.trim()) er.full_name = useAllowlist ? 'Select your name.' : 'Enter your full name.';
     if (!form.designation.trim()) er.designation = 'Enter your designation.';
-    if (!form.section.trim()) er.section = 'Enter your section.';
     if (!/^\d{10,15}$/.test(form.whatsapp.trim())) er.whatsapp = 'Use digits only (10–15).';
     if (!form.team) er.team = 'Pick a team.';
     setErrors(er);
@@ -86,7 +98,6 @@ export default function Register() {
     }
   }
 
-  // Success screen
   if (done) {
     return (
       <ImageHero src="/success.jpg" overlay="center" eager className="mx-auto mt-6 max-w-2xl min-h-[460px]">
@@ -96,9 +107,7 @@ export default function Register() {
           <p className="hero-sub mt-3 text-lg text-white">
             Backing <span className="font-bold text-gold">{done.team}</span> all the way.
           </p>
-          <p className="hero-sub mt-1 text-sm text-white/80">
-            When your team falls, you're out. Survive to the final to win.
-          </p>
+          <p className="hero-sub mt-1 text-sm text-white/80">When your team falls, you're out. Survive to the final to win.</p>
           <div className="mt-7 flex justify-center gap-3">
             {showLive && <Link to="/live" className="btn-gold">Watch live tracker</Link>}
             <button className="btn-ghost" onClick={() => setDone(null)}>Done</button>
@@ -108,8 +117,6 @@ export default function Register() {
     );
   }
 
-  // Once loaded, if registration isn't available, send people to the tracker
-  // (or show a closed notice if the tracker is also hidden).
   if (loaded && !registerAvailable) {
     if (showLive) return <Navigate to="/live" replace />;
     return (
@@ -125,7 +132,6 @@ export default function Register() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-      {/* Cinematic hero */}
       <ImageHero src="/hero-register.jpg" overlay="left" eager className="min-h-[340px] lg:min-h-[560px]">
         <p className="eyebrow">FIFA World Cup 2026 · Staff Contest</p>
         <h1 className="hero-title mt-3 font-display text-5xl leading-[0.92] text-white sm:text-7xl">
@@ -137,7 +143,6 @@ export default function Register() {
           One prediction per person. When your team is knocked out, you're out. The last predictors
           standing win. Make it count.
         </p>
-
         <div className="mt-6">
           {notYetOpen && (
             <>
@@ -154,7 +159,6 @@ export default function Register() {
         </div>
       </ImageHero>
 
-      {/* Form */}
       <section className="panel p-6 sm:p-7">
         <h2 className="font-head text-xl font-bold text-white">Enter your prediction</h2>
         <p className="mb-5 mt-1 text-sm text-muted">
@@ -162,30 +166,47 @@ export default function Register() {
         </p>
 
         <div className="space-y-4">
+          {/* Section first */}
+          <Field label="Section" error={errors.section}>
+            {useAllowlist ? (
+              <SearchSelect
+                options={sections}
+                value={form.section}
+                onChange={(s) => { setField('section', s); setField('full_name', ''); }}
+                placeholder="Type to search your section…"
+                disabled={!open}
+              />
+            ) : (
+              <input className="field-input" value={form.section} onChange={onText('section')} placeholder="e.g. ICDS" disabled={!open} />
+            )}
+          </Field>
+
+          {/* Then name (filtered by section) */}
           <Field label="Full name" error={errors.full_name}>
-            <input className="field-input" value={form.full_name} onChange={set('full_name')} placeholder="e.g. Adarsh A" disabled={!open} />
+            {useAllowlist ? (
+              <SearchSelect
+                options={namesForSection}
+                value={form.full_name}
+                onChange={(n) => setField('full_name', n)}
+                placeholder={form.section ? 'Type to search your name…' : 'Select a section first'}
+                disabled={!open || !form.section}
+                emptyText="No matching name in this section."
+              />
+            ) : (
+              <input className="field-input" value={form.full_name} onChange={onText('full_name')} placeholder="e.g. Anjali Menon" disabled={!open} />
+            )}
           </Field>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Designation" error={errors.designation}>
-              <input className="field-input" value={form.designation} onChange={set('designation')} placeholder="e.g. Senior Clerk" disabled={!open} />
-            </Field>
-            <Field label="Section" error={errors.section}>
-              <input className="field-input" value={form.section} onChange={set('section')} placeholder="e.g. ICDS B Section" disabled={!open} />
-            </Field>
-          </div>
+
+          <Field label="Designation" error={errors.designation}>
+            <input className="field-input" value={form.designation} onChange={onText('designation')} placeholder="e.g. Project Officer" disabled={!open} />
+          </Field>
+
           <Field label="WhatsApp number" error={errors.whatsapp}>
-            <input
-              className="field-input"
-              value={form.whatsapp}
-              onChange={set('whatsapp')}
-              inputMode="numeric"
-              placeholder="Digits only"
-              maxLength={15}
-              disabled={!open}
-            />
+            <input className="field-input" value={form.whatsapp} onChange={onText('whatsapp')} inputMode="numeric" placeholder="Digits only" maxLength={15} disabled={!open} />
           </Field>
+
           <Field label="Predicted winning team" error={errors.team}>
-            <TeamSelect teams={teams} value={form.team} onChange={(name) => { setForm((f) => ({ ...f, team: name })); setErrors((er) => ({ ...er, team: undefined })); }} />
+            <TeamSelect teams={teams} value={form.team} onChange={(name) => setField('team', name)} />
           </Field>
 
           <AnimatePresence>

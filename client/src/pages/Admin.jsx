@@ -5,6 +5,8 @@ import {
   getSettings,
   setTime,
   setVisibility,
+  uploadEmployees,
+  getEmployees,
   getTeams,
   eliminateTeam,
   getUsers,
@@ -21,6 +23,53 @@ function toLocalInput(iso) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
     d.getHours()
   )}:${pad(d.getMinutes())}`;
+}
+
+// Parse one CSV line, honouring double-quoted fields.
+function parseCsvLine(line) {
+  const out = [];
+  let cur = '';
+  let inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (inQ) {
+      if (c === '"') {
+        if (line[i + 1] === '"') { cur += '"'; i++; } else inQ = false;
+      } else cur += c;
+    } else if (c === '"') inQ = true;
+    else if (c === ',') { out.push(cur); cur = ''; }
+    else cur += c;
+  }
+  out.push(cur);
+  return out.map((s) => s.trim());
+}
+
+// Parse CSV text into [{ name, section }]. Detects a header row with
+// "name" and "section"; otherwise assumes column 1 = name, column 2 = section.
+function parseCsv(text) {
+  const lines = String(text)
+    .replace(/\r\n?/g, '\n')
+    .split('\n')
+    .filter((l) => l.trim() !== '');
+  if (!lines.length) return [];
+  let nameIdx = 0;
+  let secIdx = 1;
+  let start = 0;
+  const first = parseCsvLine(lines[0]).map((s) => s.toLowerCase());
+  const hasHeader = first.some((h) => h.includes('name')) && first.some((h) => h.includes('section'));
+  if (hasHeader) {
+    nameIdx = first.findIndex((h) => h.includes('name'));
+    secIdx = first.findIndex((h) => h.includes('section'));
+    start = 1;
+  }
+  const rows = [];
+  for (let i = start; i < lines.length; i++) {
+    const f = parseCsvLine(lines[i]);
+    const name = (f[nameIdx] || '').trim();
+    const section = (f[secIdx] || '').trim();
+    if (name && section) rows.push({ name, section });
+  }
+  return rows;
 }
 
 export default function Admin() {
@@ -76,6 +125,10 @@ function AdminPanel({ onLogout }) {
   const [winMsg, setWinMsg] = useState(null);
   const [vis, setVis] = useState({ show_register: true, show_live: true });
   const [visMsg, setVisMsg] = useState(null);
+  const [empCount, setEmpCount] = useState(0);
+  const [parsedEmp, setParsedEmp] = useState([]);
+  const [empFileName, setEmpFileName] = useState('');
+  const [empMsg, setEmpMsg] = useState(null);
   const [teams, setTeams] = useState([]);
   const [actionMsg, setActionMsg] = useState(null);
 
@@ -106,6 +159,49 @@ function AdminPanel({ onLogout }) {
       setVisMsg({ type: 'error', text: e?.response?.data?.error || 'Could not update visibility.' });
     }
   }
+
+  async function loadEmployees() {
+    try {
+      const d = await getEmployees();
+      setEmpCount(d.count || 0);
+    } catch (e) {
+      /* ignore */
+    }
+  }
+
+  function handleEmpFile(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    setEmpFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const rows = parseCsv(String(reader.result || ''));
+      setParsedEmp(rows);
+      setEmpMsg(
+        rows.length
+          ? { type: 'ok', text: `Parsed ${rows.length} employees from the file. Click "Upload" to save.` }
+          : { type: 'error', text: 'No valid rows found. The file needs columns: name, section.' }
+      );
+    };
+    reader.readAsText(file);
+  }
+
+  async function uploadEmpList() {
+    if (!parsedEmp.length) {
+      setEmpMsg({ type: 'error', text: 'Choose a CSV file first.' });
+      return;
+    }
+    setEmpMsg(null);
+    try {
+      const r = await uploadEmployees(parsedEmp);
+      setEmpCount(r.count);
+      setParsedEmp([]);
+      setEmpFileName('');
+      setEmpMsg({ type: 'ok', text: `Saved ${r.count} employees. The form will now restrict entries to this list.` });
+    } catch (e) {
+      setEmpMsg({ type: 'error', text: e?.response?.data?.error || 'Upload failed.' });
+    }
+  }
   async function loadTeams() {
     const d = await getTeams();
     setTeams(d.teams);
@@ -124,6 +220,7 @@ function AdminPanel({ onLogout }) {
     loadSettings();
     loadTeams();
     loadUsers();
+    loadEmployees();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -274,6 +371,33 @@ function AdminPanel({ onLogout }) {
         </button>
         <p className="mt-3 text-xs text-muted">
           Tip: the Registration page also hides automatically once the prediction window closes.
+        </p>
+      </section>
+
+      {/* F. Staff allowlist */}
+      <section className="panel p-6">
+        <h2 className="font-head text-lg font-bold text-white">F · Staff allowlist (CSV)</h2>
+        <p className="mb-4 mt-1 text-sm text-muted">
+          Upload a CSV with columns <b className="text-white">name</b> and <b className="text-white">section</b>.
+          Only listed staff can register — the form shows Section first, then the matching names.
+          Currently loaded: <b className="text-white">{empCount}</b> employees.
+        </p>
+        <input
+          type="file"
+          accept=".csv,text/csv"
+          onChange={handleEmpFile}
+          className="block w-full text-sm text-white/80 file:mr-3 file:cursor-pointer file:rounded-lg file:border-0 file:bg-gold file:px-4 file:py-2 file:font-head file:font-semibold file:uppercase file:text-ink"
+        />
+        {empFileName && <p className="mt-2 text-xs text-muted">Selected: {empFileName}</p>}
+        {empMsg && (
+          <p className={`mt-2 text-sm ${empMsg.type === 'error' ? 'text-hot' : 'text-grass'}`}>{empMsg.text}</p>
+        )}
+        <button className="btn-gold mt-4" onClick={uploadEmpList} disabled={!parsedEmp.length}>
+          Upload / replace list
+        </button>
+        <p className="mt-3 text-xs text-muted">
+          Uploading replaces the whole list. Leave it empty to allow open (free-text) registration.
+          Example CSV row: <span className="text-white/80">Anjali Menon, ICDS</span>
         </p>
       </section>
 

@@ -56,26 +56,41 @@ async function register(req, res) {
         .json({ error: 'That team is already eliminated. Please pick a team still in the contest.' });
     }
 
+    // ---- Staff allowlist ----
+    // If an employee list has been uploaded, the name + section must match it.
+    // If the list is empty, registration is open (no allowlist enforced yet).
+    const empCount = await db.query('SELECT COUNT(*)::int AS n FROM employees');
+    if (empCount.rows[0].n > 0) {
+      const allowed = await db.query(
+        `SELECT 1 FROM employees
+         WHERE lower(name) = lower($1) AND lower(section) = lower($2)
+         LIMIT 1`,
+        [full_name, section]
+      );
+      if (allowed.rowCount === 0) {
+        return res.status(403).json({
+          error: 'This name was not found in the staff list for that section. Please pick your name from the list, or contact the admin.',
+        });
+      }
+    }
+
     // ---- Duplicate guard ----
-    // Block if the same WhatsApp number OR the same person
-    // (name + designation + section) has already submitted.
+    // Block if the same WhatsApp number OR the same person (name + section)
+    // has already submitted.
     const dupRes = await db.query(
-      `SELECT whatsapp, full_name, designation, section
+      `SELECT whatsapp
        FROM users
        WHERE whatsapp = $1
-          OR (lower(full_name) = lower($2)
-              AND lower(designation) = lower($3)
-              AND lower(section) = lower($4))
+          OR (lower(full_name) = lower($2) AND lower(section) = lower($3))
        LIMIT 1`,
-      [whatsapp, full_name, designation, section]
+      [whatsapp, full_name, section]
     );
     if (dupRes.rowCount > 0) {
-      const hit = dupRes.rows[0];
-      const sameNumber = String(hit.whatsapp) === whatsapp;
+      const sameNumber = String(dupRes.rows[0].whatsapp) === whatsapp;
       return res.status(409).json({
         error: sameNumber
           ? 'This WhatsApp number has already submitted a prediction.'
-          : 'A prediction has already been submitted with these details (name, designation and section).',
+          : 'A prediction has already been submitted for this name and section.',
       });
     }
 

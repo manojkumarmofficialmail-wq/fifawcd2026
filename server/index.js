@@ -20,7 +20,7 @@ app.use(
   })
 );
 
-app.use(express.json());
+app.use(express.json({ limit: '4mb' }));
 
 // ---- Health check ----
 app.get('/api/health', (req, res) => res.json({ ok: true, service: 'wc2026-api' }));
@@ -46,6 +46,7 @@ app.get('/api/visibility', async (req, res) => {
 app.use('/api/register', require('./routes/register'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/teams', require('./routes/teams'));
+app.use('/api/employees', require('./routes/employees'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/pdf', require('./routes/pdf'));
 
