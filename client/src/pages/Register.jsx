@@ -193,12 +193,12 @@ export default function Register() {
                 emptyText="No matching name in this section."
               />
             ) : (
-              <input className="field-input" value={form.full_name} onChange={onText('full_name')} placeholder="e.g. Anjali Menon" disabled={!open} />
+              <input className="field-input" value={form.full_name} onChange={onText('full_name')} placeholder="e.g. Adarsh A" disabled={!open} />
             )}
           </Field>
 
           <Field label="Designation" error={errors.designation}>
-            <input className="field-input" value={form.designation} onChange={onText('designation')} placeholder="e.g. Project Officer" disabled={!open} />
+            <input className="field-input" value={form.designation} onChange={onText('designation')} placeholder="e.g. Senior Clerk" disabled={!open} />
           </Field>
 
           <Field label="WhatsApp number" error={errors.whatsapp}>
