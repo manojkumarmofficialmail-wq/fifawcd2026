@@ -87,13 +87,56 @@ export default function Dashboard() {
                   {champion.team}
                 </p>
                 <p className="hero-sub mt-3 text-white">
-                  {champion.winners.length} winning predictor{champion.winners.length === 1 ? '' : 's'}
-                </p>
-                <p className="hero-sub mt-1 text-sm text-white/85">
-                  {champion.winners.map((w) => w.full_name).join(' · ') || '—'}
+                  {champion.winners.length} winning predictor{champion.winners.length === 1 ? '' : 's'} — ranked by who predicted first
                 </p>
               </div>
             </ImageHero>
+
+            {/* Prize ranking — ordered by prediction date & time (earliest = 1st prize) */}
+            <div className="panel mt-4 p-5">
+              <p className="eyebrow text-gold">Prize ranking · first to predict {champion.team}</p>
+              <div className="thin-scroll mt-3 max-h-96 space-y-2 overflow-y-auto pr-1">
+                {champion.winners.map((w, i) => {
+                  const medal = ['🥇', '🥈', '🥉'][i] || null;
+                  const when = w.created_at
+                    ? new Date(w.created_at).toLocaleString(undefined, {
+                        day: '2-digit', month: 'short', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit', second: '2-digit',
+                      })
+                    : '';
+                  return (
+                    <div
+                      key={i}
+                      className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 ${
+                        i === 0 ? 'border-gold/50 bg-gold/10 shadow-glow' : 'border-white/10 bg-white/5'
+                      }`}
+                    >
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-ink text-sm font-bold text-gold">
+                        {medal || i + 1}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-head text-sm font-bold text-white">
+                          {w.full_name}
+                          {i === 0 && <span className="ml-2 text-[10px] uppercase tracking-wide text-gold">First prize</span>}
+                        </p>
+                        <p className="truncate text-xs text-muted">
+                          {[w.designation, w.section].filter(Boolean).join(' · ')}
+                        </p>
+                      </div>
+                      <span className="shrink-0 text-right text-[11px] leading-tight text-white/70">
+                        {when}
+                      </span>
+                    </div>
+                  );
+                })}
+                {champion.winners.length === 0 && (
+                  <p className="px-2 py-3 text-sm text-muted">No winning predictors.</p>
+                )}
+              </div>
+              <p className="mt-3 text-[11px] text-muted">
+                Rank is decided purely by prediction time — the earliest correct prediction wins.
+              </p>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

@@ -59,10 +59,10 @@ async function getDashboard(req, res) {
     if (pickedActive.length === 1 && total - remaining > 0) {
       const championTeam = pickedActive[0];
       const winnersRes = await db.query(
-        `SELECT full_name, designation, section
+        `SELECT full_name, designation, section, created_at
          FROM users
          WHERE team = $1 AND status = 'active'
-         ORDER BY full_name ASC`,
+         ORDER BY created_at ASC, id ASC`,
         [championTeam.name]
       );
       champion = {
