@@ -2,63 +2,70 @@
 -- Seed data for the FIFA World Cup 2026 Prediction Contest App
 -- Run AFTER schema.sql:  npm run init-db   (or psql -f seed.sql)
 --
--- This is a FRESH-START seed: 48 teams, ZERO participants.
+-- This is a FRESH-START seed: the official 48 qualified teams, ZERO participants.
 -- (Sample participants are provided commented-out at the bottom if you
 --  want test data while trying things out.)
 -- ============================================================
 
 -- ------------------------------------------------------------
--- TEAMS — exactly 48 (hosts + a broad set of strong national sides)
+-- TEAMS — the official 48 qualified for FIFA World Cup 2026
 -- ------------------------------------------------------------
 INSERT INTO teams (name, flag) VALUES
-  ('Argentina',    'AR'),
-  ('Brazil',       'BR'),
-  ('France',       'FR'),
-  ('England',      'ENG'),
-  ('Spain',        'ES'),
-  ('Germany',      'DE'),
-  ('Portugal',     'PT'),
-  ('Netherlands',  'NL'),
-  ('Italy',        'IT'),
-  ('Belgium',      'BE'),
-  ('Croatia',      'HR'),
-  ('Uruguay',      'UY'),
-  ('USA',          'US'),
-  ('Mexico',       'MX'),
-  ('Canada',       'CA'),
-  ('Japan',        'JP'),
-  ('South Korea',  'KR'),
-  ('Morocco',      'MA'),
-  ('Senegal',      'SN'),
-  ('Switzerland',  'CH'),
-  ('Denmark',      'DK'),
-  ('Colombia',     'CO'),
-  ('Australia',    'AU'),
-  ('Poland',       'PL'),
-  ('Serbia',       'RS'),
-  ('Ecuador',      'EC'),
-  ('Ghana',        'GH'),
-  ('Nigeria',      'NG'),
-  ('Cameroon',     'CM'),
-  ('Tunisia',      'TN'),
-  ('Egypt',        'EG'),
-  ('Saudi Arabia', 'SA'),
-  ('Iran',         'IR'),
-  ('Qatar',        'QA'),
-  ('Costa Rica',   'CR'),
-  ('Peru',         'PE'),
-  ('Chile',        'CL'),
-  ('Paraguay',     'PY'),
-  ('Sweden',       'SE'),
-  ('Norway',       'NO'),
-  ('Austria',      'AT'),
-  ('Wales',        'WAL'),
-  ('Scotland',     'SCO'),
-  ('Turkey',       'TR'),
-  ('Ukraine',      'UA'),
-  ('Greece',       'GR'),
-  ('Algeria',      'DZ'),
-  ('Ivory Coast',  'CI')
+  -- Hosts
+  ('Mexico','MX'),
+  ('Canada','CA'),
+  ('USA','US'),
+  -- UEFA (Europe)
+  ('Austria','AT'),
+  ('Belgium','BE'),
+  ('Bosnia and Herzegovina','BA'),
+  ('Croatia','HR'),
+  ('Czechia','CZ'),
+  ('England','ENG'),
+  ('France','FR'),
+  ('Germany','DE'),
+  ('Netherlands','NL'),
+  ('Norway','NO'),
+  ('Portugal','PT'),
+  ('Scotland','SCO'),
+  ('Spain','ES'),
+  ('Sweden','SE'),
+  ('Switzerland','CH'),
+  ('Turkey','TR'),
+  -- CAF (Africa)
+  ('Algeria','DZ'),
+  ('Cape Verde','CV'),
+  ('DR Congo','CD'),
+  ('Ivory Coast','CI'),
+  ('Egypt','EG'),
+  ('Ghana','GH'),
+  ('Morocco','MA'),
+  ('Senegal','SN'),
+  ('South Africa','ZA'),
+  ('Tunisia','TN'),
+  -- AFC (Asia)
+  ('Australia','AU'),
+  ('Iraq','IQ'),
+  ('Iran','IR'),
+  ('Japan','JP'),
+  ('Jordan','JO'),
+  ('South Korea','KR'),
+  ('Qatar','QA'),
+  ('Saudi Arabia','SA'),
+  ('Uzbekistan','UZ'),
+  -- CONMEBOL (South America)
+  ('Argentina','AR'),
+  ('Brazil','BR'),
+  ('Colombia','CO'),
+  ('Ecuador','EC'),
+  ('Paraguay','PY'),
+  ('Uruguay','UY'),
+  -- CONCACAF (non-host)
+  ('Curaçao','CW'),
+  ('Haiti','HT'),
+  ('Panama','PA'),
+  -- OFC (Oceania)
+  ('New Zealand','NZ')
 ON CONFLICT (name) DO NOTHING;
 
 -- ------------------------------------------------------------
