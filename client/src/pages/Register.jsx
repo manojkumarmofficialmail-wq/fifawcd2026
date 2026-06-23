@@ -198,7 +198,7 @@ export default function Register() {
           </Field>
 
           <Field label="Designation" error={errors.designation}>
-            <input className="field-input" value={form.designation} onChange={onText('designation')} placeholder="e.g. Senior Clerk" disabled={!open} />
+            <input className="field-input" value={form.designation} onChange={onText('designation')} placeholder="e.g. Accountant" disabled={!open} />
           </Field>
 
           <Field label="WhatsApp number" error={errors.whatsapp}>

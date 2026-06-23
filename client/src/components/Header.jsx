@@ -56,7 +56,7 @@ export default function Header({ right }) {
         />
         <div className="min-w-0 flex-1">
           <p className="truncate font-head text-[13px] font-extrabold leading-tight text-gold sm:text-[15px]">
-            Women and Child Welfare Committee
+            WCD Staff Welfare Committee
           </p>
           <p className="truncate text-[11px] leading-tight text-white/70 sm:text-[12px]">
             Directorate of Women and Child Development Department

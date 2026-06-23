@@ -109,7 +109,7 @@ async function dailyReport(req, res) {
       .fillColor(GOLD)
       .font('Helvetica-Bold')
       .fontSize(16)
-      .text('Women and Child Welfare Committee', left + 70, 28, { width: pageWidth - 70 });
+      .text('WCD Staff Welfare Committee', left + 70, 28, { width: pageWidth - 70 });
     doc
       .fillColor('#FFFFFF')
       .font('Helvetica')

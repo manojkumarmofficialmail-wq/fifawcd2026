@@ -74,7 +74,7 @@ async function getDashboard(req, res) {
 
     res.json({
       department: {
-        committee: 'Women and Child Welfare Committee',
+        committee: 'WCD Staff Welfare Committee',
         directorate: 'Directorate of Women and Child Development Department',
       },
       stats: { total, remaining, eliminated: total - remaining },
