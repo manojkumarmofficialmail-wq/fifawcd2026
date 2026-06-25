@@ -94,12 +94,19 @@ async function register(req, res) {
       });
     }
 
+    // ---- Capture submitter's IP and device (for fraud detection) ----
+    const ip =
+      (req.headers['x-forwarded-for'] || '').split(',')[0].trim() ||
+      req.socket?.remoteAddress ||
+      '';
+    const ua = (req.headers['user-agent'] || '').slice(0, 500);
+
     // ---- Insert ----
     const insertRes = await db.query(
-      `INSERT INTO users (full_name, designation, section, whatsapp, team)
-       VALUES ($1, $2, $3, $4, $5)
+      `INSERT INTO users (full_name, designation, section, whatsapp, team, ip_address, user_agent)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
        RETURNING id, full_name, team, status, created_at`,
-      [full_name, designation, section, whatsapp, team]
+      [full_name, designation, section, whatsapp, team, ip || null, ua || null]
     );
 
     return res.status(201).json({

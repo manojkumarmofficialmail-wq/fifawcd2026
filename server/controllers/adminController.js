@@ -160,7 +160,8 @@ async function listUsers(req, res) {
     }
 
     const sql =
-      `SELECT id, full_name, designation, section, whatsapp, team, status, created_at
+      `SELECT id, full_name, designation, section, whatsapp, team, status, created_at,
+              ip_address, user_agent
        FROM users
        ${where.length ? 'WHERE ' + where.join(' AND ') : ''}
        ORDER BY created_at DESC`;

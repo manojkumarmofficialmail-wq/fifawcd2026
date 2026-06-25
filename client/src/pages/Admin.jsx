@@ -482,6 +482,8 @@ function AdminPanel({ onLogout }) {
                 <th className="px-3 py-2">Section</th>
                 <th className="px-3 py-2">Team</th>
                 <th className="px-3 py-2">WhatsApp</th>
+                <th className="px-3 py-2">IP Address</th>
+                <th className="px-3 py-2">Device</th>
                 <th className="px-3 py-2">Status</th>
               </tr>
             </thead>
@@ -493,6 +495,18 @@ function AdminPanel({ onLogout }) {
                   <td className="px-3 py-2 text-white/80">{u.section}</td>
                   <td className="px-3 py-2 text-white/80">{u.team}</td>
                   <td className="px-3 py-2 text-white/60">{u.whatsapp}</td>
+                  <td className="px-3 py-2 text-white/60 font-mono text-xs">
+                    {u.ip_address || <span className="text-muted italic">—</span>}
+                  </td>
+                  <td className="px-3 py-2 text-white/50 text-xs max-w-[160px] truncate" title={u.user_agent || ''}>
+                    {u.user_agent
+                      ? u.user_agent.includes('Mobile') ? '📱 Mobile'
+                        : u.user_agent.includes('Windows') ? '🖥 Windows'
+                        : u.user_agent.includes('Mac') ? '🍎 Mac'
+                        : u.user_agent.includes('Linux') ? '🐧 Linux'
+                        : '🌐 Browser'
+                      : <span className="text-muted italic">—</span>}
+                  </td>
                   <td className="px-3 py-2">
                     <span
                       className={`rounded-full px-2 py-0.5 text-xs ${
@@ -506,7 +520,7 @@ function AdminPanel({ onLogout }) {
               ))}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-3 py-8 text-center text-muted">
+                  <td colSpan={8} className="px-3 py-8 text-center text-muted">
                     No participants match these filters.
                   </td>
                 </tr>
